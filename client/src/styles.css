@@ -19,6 +19,8 @@ body {
 
 #app {
   height: 100vh;
+  /* fallback for safari ios */
+  height: -webkit-fill-available;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,6 +141,10 @@ body {
   background: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.5);
   color: white;
+}
+
+.button-icon {
+  height: 18px;
 }
 
 .input {
@@ -354,6 +360,9 @@ body {
 .share-button {
   min-width: 140px;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .share-button:hover {
@@ -412,10 +421,19 @@ body {
     justify-content: space-between;
     gap: 0.5rem;
   }
+  
+  .button {
+    padding: 6px 12px;
+    max-height: 44px;
+  }
+
+  .button-icon {
+    height: 14px;
+  }
 
   .share-button {
     min-width: auto;
-    font-size: 0.875rem;
+    gap: 4px;
   }
 
   .session-title h2 {
