@@ -12,19 +12,14 @@ a {
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  height: 100vh;
   color: #333;
-  overflow: hidden;
 }
 
 #app {
-  height: 100vh;
-  /* fallback for safari ios */
-  height: -webkit-fill-available;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
 }
 
 /* Animations */
@@ -59,7 +54,7 @@ body {
 /* Global Footer */
 .global-footer {
   position: fixed;
-  bottom: 1rem;
+  bottom: 1.44rem;
   right: 1rem;
   z-index: 1000;
 }
@@ -215,7 +210,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 2rem 2rem 4rem;
   overflow: auto;
   width: 100%;
   min-width: 0;
@@ -223,6 +218,7 @@ body {
 
 .login-form {
   text-align: center;
+  height: 100vh;
   width: 100%;
   max-width: 400px;
 }
