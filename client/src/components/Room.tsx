@@ -1,22 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import { RoomSessionData, Message } from "../sessionClient";
+import { RoomSessionData, Message, SessionClient } from "../sessionClient";
 
 export default function Room({
   userId,
   snapshot,
-  connectionHost,
-  onSend,
+  client,
 }: {
   userId: string;
-  connectionHost: string;
   snapshot: RoomSessionData;
-  onSend: (message: string) => void;
+  client: SessionClient;
 }) {
   return (
     <div className="chat-container">
-      <RoomHeader connectedUsers={snapshot.connectedUsers} currentUserId={userId} connectionHost={connectionHost} />
+      <RoomHeader connectedUsers={snapshot.connectedUsers} currentUserId={userId} connectionHost={client.host} />
       <MessageList messages={snapshot.messages} currentUserId={userId} />
-      <MessageInput onSend={onSend} />
+      <MessageInput onSend={(msg) => client.sendMessage(msg)} />
     </div>
   );
 }

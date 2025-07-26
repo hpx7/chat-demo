@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useOutletContext, useParams, Link } from "react-router";
 import { lookupRoom } from "../backendClient";
-import { connect, RoomSessionData } from "../sessionClient";
+import { RoomSessionData, SessionClient } from "../sessionClient";
 import hyperlink from "../assets/hyperlink.svg";
 import Room from "./Room";
 
@@ -11,7 +11,7 @@ export default function Session() {
   const { roomId } = useParams<{ roomId: string }>();
   const { token, userId } = useOutletContext<{ token: string; userId: string }>();
   const [status, setStatus] = useState<SessionStatus>("Connecting");
-  const [socket, setSocket] = useState<WebSocket>();
+  const [client, setClient] = useState<SessionClient>();
   const [snapshot, setSnapshot] = useState<RoomSessionData>();
 
   if (roomId == null) {
@@ -26,14 +26,15 @@ export default function Session() {
         setStatus("Not Found");
         return;
       }
-      const socket = await connect(sessionInfo.host, sessionInfo.token, setSnapshot);
+      const client = await SessionClient.connect(sessionInfo.host, sessionInfo.token);
+      client.onMessage(setSnapshot);
       setStatus("Connected");
-      setSocket(socket);
+      setClient(client);
       console.log("Connected", roomId);
-      socket.onclose = (event) => {
-        console.log("Disconnected", roomId, event.code, event.reason);
+      client.onClose(() => {
+        console.log("Disconnected", roomId);
         setStatus("Disconnected");
-      };
+      });
     } catch (error) {
       console.error("Connection error:", error);
       setStatus("Error");
@@ -46,14 +47,14 @@ export default function Session() {
 
   useEffect(() => {
     return () => {
-      socket?.close();
+      client?.close();
     };
-  }, [socket]);
+  }, [client]);
 
   return (
     <div className="session-container">
       <SessionHeader roomId={roomId} />
-      <SessionContent userId={userId} status={status} socket={socket} snapshot={snapshot} onReconnect={connectToRoom} />
+      <SessionContent userId={userId} status={status} client={client} snapshot={snapshot} onReconnect={connectToRoom} />
     </div>
   );
 }
@@ -93,25 +94,20 @@ function SessionHeader({ roomId }: { roomId: string }) {
 function SessionContent({
   userId,
   status,
-  socket,
+  client,
   snapshot,
   onReconnect,
 }: {
   userId: string;
   status: SessionStatus;
-  socket: WebSocket | undefined;
+  client: SessionClient | undefined;
   snapshot: RoomSessionData | undefined;
   onReconnect: () => void;
 }) {
   return (
     <div className="session-content">
-      {status === "Connected" && socket != null && snapshot != null ? (
-        <Room
-          userId={userId}
-          connectionHost={socket.url.split("/")[2]}
-          snapshot={snapshot}
-          onSend={(msg) => socket.send(msg)}
-        />
+      {status === "Connected" && client != null && snapshot != null ? (
+        <Room userId={userId} snapshot={snapshot} client={client} />
       ) : (
         <StatusMessage status={status} onReconnect={onReconnect} />
       )}
